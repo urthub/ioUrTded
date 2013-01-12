@@ -353,7 +353,6 @@ LAN clients will have their rate var ignored
 ==================
 */
 qboolean Sys_IsLANAddress( netadr_t adr ) {
-	int		i;
 
 	if( adr.type == NA_LOOPBACK ) {
 		return qtrue;
@@ -373,11 +372,12 @@ qboolean Sys_IsLANAddress( netadr_t adr ) {
 		return qtrue;
 	if(adr.ip[0] == 192 && adr.ip[1] == 168)
 		return qtrue;
+	if(adr.ip[0] == 127)
+		return qtrue;
+	
+	return qfalse;
 
-	// choose which comparison to use based on the class of the address being tested
-	// any local adresses of a different class than the address being tested will fail based on the first byte
-	// FIXME tma 28/08/07 Try and make this work for arbitrary subnet masks somehow
-
+	/*
 	if( adr.ip[0] == 127 && adr.ip[1] == 0 && adr.ip[2] == 0 && adr.ip[3] == 1 ) {
 		return qtrue;
 	}
@@ -410,6 +410,7 @@ qboolean Sys_IsLANAddress( netadr_t adr ) {
 		}
 	}
 	return qfalse;
+	*/
 }
 
 /*
