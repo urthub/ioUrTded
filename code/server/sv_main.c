@@ -22,9 +22,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "server.h"
 
-serverStatic_t	svs;				// persistant server info
-server_t		sv;					// local server
-vm_t			*gvm = NULL;				// game virtual machine
+serverStatic_t	svs;			// persistant server info
+server_t		sv;				// local server
+vm_t			*gvm = NULL;	// game virtual machine
 
 cvar_t	*sv_fps;				// time rate for running non-clients
 cvar_t	*sv_timeout;			// seconds without any message
@@ -136,7 +136,7 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 //	}
 
 	// do not send commands until the gamestate has been sent
-	if( client->state < CS_PRIMED )
+	if ( client->state < CS_PRIMED )
 		return;
 
 	client->reliableSequence++;
@@ -196,7 +196,7 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 	}
 
 	// send the data to all relevent clients
-	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
+	for ( j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++ ) {
 		SV_AddServerCommand( client, (char *)message );
 	}
 }
@@ -338,7 +338,7 @@ void SVC_Status( netadr_t from ) {
 	status[0] = 0;
 	statusLength = 0;
 
-	for (i=0 ; i < sv_maxclients->integer ; i++) {
+	for ( i=0 ; i < sv_maxclients->integer ; i++ ) {
 		cl = &svs.clients[i];
 		if ( cl->state >= CS_CONNECTED ) {
 			ps = SV_GameClientNum( i );
@@ -380,7 +380,7 @@ void SVC_Info( netadr_t from ) {
 	 */
 
 	// A maximum challenge length of 128 should be more than plenty.
-	if(strlen(Cmd_Argv(1)) > 128)
+	if ( strlen(Cmd_Argv(1)) > 128 )
 		return;
 
 	// don't count privateclients
@@ -406,14 +406,14 @@ void SVC_Info( netadr_t from ) {
 	Info_SetValueForKey( infostring, "gametype", va("%i", sv_gametype->integer ) );
 	Info_SetValueForKey( infostring, "pure", va("%i", sv_pure->integer ) );
 
-	if( sv_minPing->integer ) {
+	if ( sv_minPing->integer ) {
 		Info_SetValueForKey( infostring, "minPing", va("%i", sv_minPing->integer) );
 	}
-	if( sv_maxPing->integer ) {
+	if ( sv_maxPing->integer ) {
 		Info_SetValueForKey( infostring, "maxPing", va("%i", sv_maxPing->integer) );
 	}
 	gamedir = Cvar_VariableString( "fs_game" );
-	if( *gamedir ) {
+	if ( *gamedir ) {
 		Info_SetValueForKey( infostring, "game", gamedir );
 	}
 
@@ -514,17 +514,17 @@ If the address isn't NA_IP, it's automatically denied.
 */
 qboolean SV_CheckDRDoS(netadr_t from)
 {
-	netadr_t	exactFrom;
+	netadr_t 	exactFrom;
 	int		i;
-	floodBan_t	*ban;
+	floodBan_t 	*ban;
 	int		oldestBan;
 	int		oldestBanTime;
 	int		globalCount;
 	int		specificCount;
-	receipt_t	*receipt;
+	receipt_t 	*receipt;
 	int		oldest;
 	int		oldestTime;
-	static int	lastGlobalLogTime = 0;
+	static int 	lastGlobalLogTime = 0;
 
 	// Usually the network is smart enough to not allow incoming UDP packets
 	// with a source address being a spoofed LAN address.  Even if that's not
@@ -716,7 +716,7 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 	qport = MSG_ReadShort( msg ) & 0xffff;
 
 	// find which client the message is from
-	for (i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
+	for ( i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
 		if (cl->state == CS_FREE) {
 			continue;
 		}
@@ -770,7 +770,7 @@ void SV_CalcPings( void ) {
 	int			delta;
 	playerState_t	*ps;
 
-	for (i=0 ; i < sv_maxclients->integer ; i++) {
+	for ( i=0 ; i < sv_maxclients->integer ; i++ ) {
 		cl = &svs.clients[i];
 		if ( cl->state != CS_ACTIVE ) {
 			cl->ping = 999;
@@ -832,7 +832,7 @@ void SV_CheckTimeouts( void ) {
 	droppoint = svs.time - 1000 * sv_timeout->integer;
 	zombiepoint = svs.time - 1000 * sv_zombietime->integer;
 
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
+	for ( i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
 		// message times may be wrong across a changelevel
 		if (cl->lastPacketTime > svs.time) {
 			cl->lastPacketTime = svs.time;
@@ -875,7 +875,7 @@ qboolean SV_CheckPaused( void ) {
 
 	// only pause if there is just a single client connected
 	count = 0;
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
+	for ( i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
 		if ( cl->state >= CS_CONNECTED && cl->netchan.remoteAddress.type != NA_BOT ) {
 			count++;
 		}
@@ -935,7 +935,7 @@ void SV_Frame( int msec ) {
 
 	frameMsec = 1000 / sv_fps->integer * com_timescale->value;
 	// don't let it scale below 1ms
-	if(frameMsec < 1)
+	if ( frameMsec < 1 )
 	{
 		Cvar_Set("timescale", va("%f", sv_fps->integer / 1000.0f));
 		frameMsec = 1;
@@ -943,7 +943,7 @@ void SV_Frame( int msec ) {
 
 	sv.timeResidual += msec;
 
-	if (!com_dedicated->integer) SV_BotFrame (sv.time + sv.timeResidual);
+	if ( !com_dedicated->integer ) SV_BotFrame (sv.time + sv.timeResidual);
 
 	if ( com_dedicated->integer && sv.timeResidual < frameMsec ) {
 		// NET_Sleep will give the OS time slices until either get a packet
@@ -968,7 +968,7 @@ void SV_Frame( int msec ) {
 		return;
 	}
 
-	if( sv.restartTime && sv.time >= sv.restartTime ) {
+	if ( sv.restartTime && sv.time >= sv.restartTime ) {
 		sv.restartTime = 0;
 		Cbuf_AddText( "map_restart 0\n" );
 		return;
