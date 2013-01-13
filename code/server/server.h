@@ -193,6 +193,23 @@ typedef struct {
 	qboolean	connected;
 } challenge_t;
 
+typedef struct {
+	netadr_t	adr;
+	int		time;
+} receipt_t;
+
+typedef struct {
+	netadr_t	adr;
+	int		time;
+	int		count;
+	qboolean	flood;
+} floodBan_t;
+
+// MAX_INFO_RECEIPTS is the maximum number of getstatus+getinfo responses that we send
+// in a two second time period.
+#define MAX_INFO_RECEIPTS	48
+
+#define MAX_INFO_FLOOD_BANS	36
 
 #define	MAX_MASTERS	8				// max recipients for heartbeat packets
 
@@ -211,6 +228,8 @@ typedef struct {
 	entityState_t	*snapshotEntities;		// [numSnapshotEntities]
 	int			nextHeartbeatTime;
 	challenge_t	challenges[MAX_CHALLENGES];	// to prevent invalid IPs from connecting
+	receipt_t	infoReceipts[MAX_INFO_RECEIPTS];	// prevent getinfo/getstatus flood and DRDoS attacks
+	floodBan_t	infoFloodBans[MAX_INFO_FLOOD_BANS];
 	netadr_t	redirectAddress;			// for rcon return messages
 
 	netadr_t	authorizeAddress;			// for rcon return messages
