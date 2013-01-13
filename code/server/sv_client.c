@@ -233,20 +233,30 @@ void SV_DirectConnect( netadr_t from ) {
 	if ( !NET_IsLocalAddress (from) ) {
 		int		ping;
 
-		for (i=0 ; i<MAX_CHALLENGES ; i++) {
-			if (NET_CompareAdr(from, svs.challenges[i].adr)) {
+		for ( i=0 ; i<MAX_CHALLENGES ; i++ ) {
+			if ( NET_CompareAdr(from, svs.challenges[i].adr) ) {
 				if ( challenge == svs.challenges[i].challenge ) {
 					break;		// good
 				}
 			}
 		}
-		if (i == MAX_CHALLENGES) {
+		if ( i == MAX_CHALLENGES ) {
 			NET_OutOfBandPrint( NS_SERVER, from, "print\nNo or bad challenge for address.\n" );
 			return;
 		}
 
 		ping = svs.time - svs.challenges[i].pingTime;
-		Com_Printf( "Client %i connecting with %i challenge ping\n", i, ping );
+
+		// Note that it is totally possible to flood the console and qconsole.log by being rejected
+		// (high ping, ban, server full, or other) and repeatedly sending a connect packet against the same
+		// challenge.  Prevent this situation by only logging the first time we hit SV_DirectConnect()
+		// for this challenge.
+		if ( !svs.challenges[i].connected ) {
+			Com_Printf("Client %i connecting with %i challenge ping\n", i, ping);
+		}
+		else {
+			Com_DPrintf("Client %i connecting again with %i challenge ping\n", i, ping);
+		}
 		svs.challenges[i].connected = qtrue;
 
 		// never reject a LAN client based on ping
@@ -423,12 +433,30 @@ or crashing -- SV_FinalMessage() will handle that
 */
 void SV_DropClient( client_t *drop, const char *reason ) {
 	int		i;
-	challenge_t	*challenge;
+	//challenge_t	*challenge;	
 
 	if ( drop->state == CS_ZOMBIE ) {
 		return;		// already dropped
 	}
-
+	// Setting the connected state of the challenge to false is totally unnecessary and only
+	// leads to all sorts of anomalies.  Here is my explanation of why commenting this out will
+	// not break anything.  When a player connects and reaches the point in SV_DirectConnect()
+	// where the challenge connected state is set to true, the client may be dropped due to
+	// high ping, being banned by the VM, a server full, or other reasons.  In these cases,
+	// the client struct is never created for the connection and the player is never dropped
+	// using SV_DropClient().  SV_DropClient() happens to be the only place where a challenge's
+	// connected state is set to false, other than in SV_GetChallenge() where a new challenge
+	// is allocated.  So, when the player is dropped for high ping (and for other other reasons
+	// stated above) and tries to reconnect from scratch using the getchallenge packet, a
+	// new challenge structure is created (the old one doesn't get reused).  There is no
+	// more harm done in not reusing a challenge if a player happens to connect all the way
+	// because connecting all the way happens much less frequently.  The challenge does not
+	// contain any important information that we need when the client tries to reconnect.
+	// Now what commenting this secion out improves: the challenge fields (challenge, time,
+	// pingTime, and firstTime) will all be computed from scratch, just like how it should be.
+	// If the challenge struct is extended in various patches, the properties of the challenge
+	// won't get inherited by subsequent connections by the same client.  This is much cleaner.
+	/*
 	if (drop->netchan.remoteAddress.type != NA_BOT) {
 		// see if we already have a challenge for this ip
 		challenge = &svs.challenges[0];
@@ -440,6 +468,7 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 			}
 		}
 	}
+	*/
 
 	// Kill any download
 	SV_CloseDownload( drop );
