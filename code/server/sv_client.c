@@ -1171,21 +1171,22 @@ void SV_UserinfoChanged( client_t *cl ) {
 	// TTimo
 	// maintain the IP information
 	// the banning code relies on this being consistently present
-	if( NET_IsLocalAddress(cl->netchan.remoteAddress) )
+	if ( NET_IsLocalAddress(cl->netchan.remoteAddress) )
 		ip = "localhost";
 	else
 		ip = (char*)NET_AdrToString( cl->netchan.remoteAddress );
 
 	val = Info_ValueForKey( cl->userinfo, "ip" );
-	if( val[0] )
+	if ( val[0] )
 		len = strlen( ip ) - strlen( val ) + strlen( cl->userinfo );
 	else
 		len = strlen( ip ) + 4 + strlen( cl->userinfo );
 
-	if( len >= MAX_INFO_STRING )
+	if ( len >= MAX_INFO_STRING ) {
 		SV_DropClient( cl, "userinfo string length exceeded" );
-	else
-		Info_SetValueForKey( cl->userinfo, "ip", ip );
+		return;
+	}
+	Info_SetValueForKey( cl->userinfo, "ip", ip );
 
 }
 
