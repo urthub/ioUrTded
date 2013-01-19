@@ -119,7 +119,7 @@ static void Netchan_ScramblePacket( msg_t *buf ) {
 	}
 
 	// generate a sequence of "random" numbers
-	for (i = 0 ; i < c ; i++) {
+	for ( i = 0 ; i < c ; i++ ) {
 		seed = (119 * seed + 1);
 		seq[i] = seed;
 	}
@@ -128,7 +128,7 @@ static void Netchan_ScramblePacket( msg_t *buf ) {
 	for ( mask = 1 ; mask < c-SCRAMBLE_START ; mask = ( mask << 1 ) + 1 ) {
 	}
 	mask >>= 1;
-	for (i = SCRAMBLE_START ; i < c ; i++) {
+	for ( i = SCRAMBLE_START ; i < c ; i++ ) {
 		j = SCRAMBLE_START + ( seq[i] & mask );
 		temp = buf->data[j];
 		buf->data[j] = buf->data[i];
@@ -136,7 +136,7 @@ static void Netchan_ScramblePacket( msg_t *buf ) {
 	}
 
 	// byte xor the data after the header
-	for (i = SCRAMBLE_START ; i < c ; i++) {
+	for ( i = SCRAMBLE_START ; i < c ; i++ ) {
 		buf->data[i] ^= seq[i];
 	}
 }
@@ -156,13 +156,13 @@ static void Netchan_UnScramblePacket( msg_t *buf ) {
 	}
 
 	// generate a sequence of "random" numbers
-	for (i = 0 ; i < c ; i++) {
+	for ( i = 0 ; i < c ; i++ ) {
 		seed = (119 * seed + 1);
 		seq[i] = seed;
 	}
 
 	// byte xor the data after the header
-	for (i = SCRAMBLE_START ; i < c ; i++) {
+	for ( i = SCRAMBLE_START ; i < c ; i++ ) {
 		buf->data[i] ^= seq[i];
 	}
 
@@ -170,7 +170,7 @@ static void Netchan_UnScramblePacket( msg_t *buf ) {
 	for ( mask = 1 ; mask < c-SCRAMBLE_START ; mask = ( mask << 1 ) + 1 ) {
 	}
 	mask >>= 1;
-	for (i = c-1 ; i >= SCRAMBLE_START ; i--) {
+	for ( i = c-1 ; i >= SCRAMBLE_START ; i-- ) {
 		j = SCRAMBLE_START + ( seq[i] & mask );
 		temp = buf->data[j];
 		buf->data[j] = buf->data[i];
@@ -469,15 +469,15 @@ Compares without the port
 */
 qboolean	NET_CompareBaseAdr (netadr_t a, netadr_t b)
 {
-	if (a.type != b.type)
+	if ( a.type != b.type )
 		return qfalse;
 
-	if (a.type == NA_LOOPBACK)
+	if ( a.type == NA_LOOPBACK )
 		return qtrue;
 
-	if (a.type == NA_IP)
+	if ( a.type == NA_IP )
 	{
-		if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3])
+		if ( a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3] )
 			return qtrue;
 		return qfalse;
 	}
@@ -490,11 +490,11 @@ const char	*NET_AdrToString (netadr_t a)
 {
 	static	char	s[64];
 
-	if (a.type == NA_LOOPBACK) {
+	if ( a.type == NA_LOOPBACK ) {
 		Com_sprintf (s, sizeof(s), "loopback");
-	} else if (a.type == NA_BOT) {
+	} else if ( a.type == NA_BOT ) {
 		Com_sprintf (s, sizeof(s), "bot");
-	} else if (a.type == NA_IP) {
+	} else if ( a.type == NA_IP ) {
 		Com_sprintf (s, sizeof(s), "%i.%i.%i.%i:%hu",
 			a.ip[0], a.ip[1], a.ip[2], a.ip[3], BigShort(a.port));
 	}
@@ -505,15 +505,15 @@ const char	*NET_AdrToString (netadr_t a)
 
 qboolean	NET_CompareAdr (netadr_t a, netadr_t b)
 {
-	if (a.type != b.type)
+	if ( a.type != b.type )
 		return qfalse;
 
-	if (a.type == NA_LOOPBACK)
+	if ( a.type == NA_LOOPBACK )
 		return qtrue;
 
-	if (a.type == NA_IP)
+	if ( a.type == NA_IP )
 	{
-		if (a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3] && a.port == b.port)
+		if ( a.ip[0] == b.ip[0] && a.ip[1] == b.ip[1] && a.ip[2] == b.ip[2] && a.ip[3] == b.ip[3] && a.port == b.port )
 			return qtrue;
 		return qfalse;
 	}
@@ -561,10 +561,10 @@ qboolean	NET_GetLoopPacket (netsrc_t sock, netadr_t *net_from, msg_t *net_messag
 
 	loop = &loopbacks[sock];
 
-	if (loop->send - loop->get > MAX_LOOPBACK)
+	if ( loop->send - loop->get > MAX_LOOPBACK )
 		loop->get = loop->send - MAX_LOOPBACK;
 
-	if (loop->get >= loop->send)
+	if ( loop->get >= loop->send )
 		return qfalse;
 
 	i = loop->get & (MAX_LOOPBACK-1);
@@ -621,7 +621,7 @@ static void NET_QueuePacket( int length, const void *data, netadr_t to,
 	new->release = Sys_Milliseconds() + offset;	
 	new->next = NULL;
 
-	if(!packetQueue) {
+	if( !packetQueue ) {
 		packetQueue = new;
 		return;
 	}
@@ -748,7 +748,7 @@ qboolean	NET_StringToAdr( const char *s, netadr_t *a ) {
 	char	base[MAX_STRING_CHARS];
 	char	*port;
 
-	if (!strcmp (s, "localhost")) {
+	if ( !strcmp (s, "localhost" )) {
 		Com_Memset (a, 0, sizeof(*a));
 		a->type = NA_LOOPBACK;
 		return qtrue;

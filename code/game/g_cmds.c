@@ -45,7 +45,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 
 	numSorted = level.numConnectedClients;
 	
-	for (i=0 ; i < numSorted ; i++) {
+	for ( i=0 ; i < numSorted ; i++ ) {
 		int		ping;
 
 		cl = &level.clients[level.sortedClients[i]];
@@ -56,7 +56,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			ping = cl->ps.ping < 999 ? cl->ps.ping : 999;
 		}
 
-		if( cl->accuracy_shots ) {
+		if ( cl->accuracy_shots ) {
 			accuracy = cl->accuracy_hits * 100 / cl->accuracy_shots;
 		}
 		else {
@@ -76,7 +76,7 @@ void DeathmatchScoreboardMessage( gentity_t *ent ) {
 			perfect,
 			cl->ps.persistant[PERS_CAPTURES]);
 		j = strlen(entry);
-		if (stringlength + j > 1024)
+		if ( stringlength + j > 1024 )
 			break;
 		strcpy (string + stringlength, entry);
 		stringlength += j;
@@ -189,7 +189,7 @@ int ClientNumberFromString( gentity_t *to, char *s ) {
 	char		n2[MAX_STRING_CHARS];
 
 	// numeric values are just slot numbers
-	if (s[0] >= '0' && s[0] <= '9') {
+	if ( s[0] >= '0' && s[0] <= '9' ) {
 		idnum = atoi( s );
 		if ( idnum < 0 || idnum >= level.maxclients ) {
 			trap_SendServerCommand( to-g_entities, va("print \"Bad client slot: %i\n\"", idnum));
@@ -242,60 +242,59 @@ void Cmd_Give_f (gentity_t *ent)
 
 	name = ConcatArgs( 1 );
 
-	if (Q_stricmp(name, "all") == 0)
+	if ( Q_stricmp(name, "all") == 0 )
 		give_all = qtrue;
 	else
 		give_all = qfalse;
 
-	if (give_all || Q_stricmp( name, "health") == 0)
+	if ( give_all || Q_stricmp( name, "health") == 0 )
 	{
 		ent->health = ent->client->ps.stats[STAT_MAX_HEALTH];
-		if (!give_all)
+		if ( !give_all )
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "weapons") == 0)
+	if ( give_all || Q_stricmp(name, "weapons") == 0 )
 	{
 		ent->client->ps.stats[STAT_WEAPONS] = (1 << WP_NUM_WEAPONS) - 1 - 
 			( 1 << WP_GRAPPLING_HOOK ) - ( 1 << WP_NONE );
-		if (!give_all)
+		if ( !give_all )
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "ammo") == 0)
+	if ( give_all || Q_stricmp(name, "ammo") == 0 )
 	{
 		for ( i = 0 ; i < MAX_WEAPONS ; i++ ) {
 			ent->client->ps.ammo[i] = 999;
 		}
-		if (!give_all)
+		if ( !give_all )
 			return;
 	}
 
-	if (give_all || Q_stricmp(name, "armor") == 0)
+	if ( give_all || Q_stricmp(name, "armor") == 0 )
 	{
 		ent->client->ps.stats[STAT_ARMOR] = 200;
-
-		if (!give_all)
+		if ( !give_all) 
 			return;
 	}
 
-	if (Q_stricmp(name, "excellent") == 0) {
+	if ( Q_stricmp(name, "excellent") == 0 ) {
 		ent->client->ps.persistant[PERS_EXCELLENT_COUNT]++;
 		return;
 	}
-	if (Q_stricmp(name, "impressive") == 0) {
+	if ( Q_stricmp(name, "impressive") == 0 ) {
 		ent->client->ps.persistant[PERS_IMPRESSIVE_COUNT]++;
 		return;
 	}
-	if (Q_stricmp(name, "gauntletaward") == 0) {
+	if ( Q_stricmp(name, "gauntletaward") == 0 ) {
 		ent->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT]++;
 		return;
 	}
-	if (Q_stricmp(name, "defend") == 0) {
+	if ( Q_stricmp(name, "defend") == 0 ) {
 		ent->client->ps.persistant[PERS_DEFEND_COUNT]++;
 		return;
 	}
-	if (Q_stricmp(name, "assist") == 0) {
+	if ( Q_stricmp(name, "assist") == 0 ) {
 		ent->client->ps.persistant[PERS_ASSIST_COUNT]++;
 		return;
 	}
@@ -303,7 +302,7 @@ void Cmd_Give_f (gentity_t *ent)
 	// spawn a specific item right on the player
 	if ( !give_all ) {
 		it = BG_FindItem (name);
-		if (!it) {
+		if ( !it ) {
 			return;
 		}
 
@@ -314,7 +313,7 @@ void Cmd_Give_f (gentity_t *ent)
 		FinishSpawningItem(it_ent );
 		memset( &trace, 0, sizeof( trace ) );
 		Touch_Item (it_ent, ent, &trace);
-		if (it_ent->inuse) {
+		if ( it_ent->inuse ) {
 			G_FreeEntity( it_ent );
 		}
 	}
@@ -339,7 +338,7 @@ void Cmd_God_f (gentity_t *ent)
 	}
 
 	ent->flags ^= FL_GODMODE;
-	if (!(ent->flags & FL_GODMODE) )
+	if ( !(ent->flags & FL_GODMODE) )
 		msg = "godmode OFF\n";
 	else
 		msg = "godmode ON\n";
@@ -365,7 +364,7 @@ void Cmd_Notarget_f( gentity_t *ent ) {
 	}
 
 	ent->flags ^= FL_NOTARGET;
-	if (!(ent->flags & FL_NOTARGET) )
+	if ( !(ent->flags & FL_NOTARGET) )
 		msg = "notarget OFF\n";
 	else
 		msg = "notarget ON\n";
@@ -465,7 +464,7 @@ void Cmd_Kill_f( gentity_t *ent ) {
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR ) {
 		return;
 	}
-	if (ent->health <= 0) {
+	if ( ent->health <= 0 ) {
 		return;
 	}
 	ent->flags &= ~FL_GODMODE;
@@ -807,13 +806,13 @@ G_Say
 */
 
 static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
-	if (!other) {
+	if ( !other ) {
 		return;
 	}
-	if (!other->inuse) {
+	if ( !other->inuse ) {
 		return;
 	}
-	if (!other->client) {
+	if ( !other->client ) {
 		return;
 	}
 	if ( other->client->pers.connected != CON_CONNECTED ) {
@@ -890,7 +889,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	}
 
 	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
+	for ( j = 0; j < level.maxclients; j++ ) {
 		other = &g_entities[j];
 		G_SayTo( ent, other, mode, color, name, text );
 	}
@@ -909,7 +908,7 @@ static void Cmd_Say_f( gentity_t *ent, int mode, qboolean arg0 ) {
 		return;
 	}
 
-	if (arg0)
+	if ( arg0 )
 	{
 		p = ConcatArgs( 0 );
 	}
@@ -963,13 +962,13 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 	int color;
 	char *cmd;
 
-	if (!other) {
+	if ( !other ) {
 		return;
 	}
-	if (!other->inuse) {
+	if ( !other->inuse ) {
 		return;
 	}
-	if (!other->client) {
+	if ( !other->client ) {
 		return;
 	}
 	if ( mode == SAY_TEAM && !OnSameTeam(ent, other) ) {
@@ -980,11 +979,11 @@ static void G_VoiceTo( gentity_t *ent, gentity_t *other, int mode, const char *i
 		return;
 	}
 
-	if (mode == SAY_TEAM) {
+	if ( mode == SAY_TEAM ) {
 		color = COLOR_CYAN;
 		cmd = "vtchat";
 	}
-	else if (mode == SAY_TELL) {
+	else if ( mode == SAY_TELL ) {
 		color = COLOR_MAGENTA;
 		cmd = "vtell";
 	}
@@ -1015,7 +1014,7 @@ void G_Voice( gentity_t *ent, gentity_t *target, int mode, const char *id, qbool
 	}
 
 	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
+	for ( j = 0; j < level.maxclients; j++ ) {
 		other = &g_entities[j];
 		G_VoiceTo( ent, other, mode, id, voiceonly );
 	}
@@ -1033,7 +1032,7 @@ static void Cmd_Voice_f( gentity_t *ent, int mode, qboolean arg0, qboolean voice
 		return;
 	}
 
-	if (arg0)
+	if ( arg0 )
 	{
 		p = ConcatArgs( 0 );
 	}
@@ -1092,26 +1091,26 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 	gentity_t *who;
 	int i;
 
-	if (!ent->client) {
+	if ( !ent->client ) {
 		return;
 	}
 
 	// insult someone who just killed you
-	if (ent->enemy && ent->enemy->client && ent->enemy->client->lastkilled_client == ent->s.number) {
+	if ( ent->enemy && ent->enemy->client && ent->enemy->client->lastkilled_client == ent->s.number ) {
 		// i am a dead corpse
-		if (!(ent->enemy->r.svFlags & SVF_BOT)) {
+		if ( !(ent->enemy->r.svFlags & SVF_BOT) ) {
 			G_Voice( ent, ent->enemy, SAY_TELL, VOICECHAT_DEATHINSULT, qfalse );
 		}
-		if (!(ent->r.svFlags & SVF_BOT)) {
+		if ( !(ent->r.svFlags & SVF_BOT) ) {
 			G_Voice( ent, ent,        SAY_TELL, VOICECHAT_DEATHINSULT, qfalse );
 		}
 		ent->enemy = NULL;
 		return;
 	}
 	// insult someone you just killed
-	if (ent->client->lastkilled_client >= 0 && ent->client->lastkilled_client != ent->s.number) {
+	if ( ent->client->lastkilled_client >= 0 && ent->client->lastkilled_client != ent->s.number ) {
 		who = g_entities + ent->client->lastkilled_client;
-		if (who->client) {
+		if ( who->client ) {
 			// who is the person I just killed
 			if (who->client->lasthurt_mod == MOD_GAUNTLET) {
 				if (!(who->r.svFlags & SVF_BOT)) {
@@ -1133,9 +1132,9 @@ static void Cmd_VoiceTaunt_f( gentity_t *ent ) {
 		}
 	}
 
-	if (g_gametype.integer >= GT_TEAM) {
+	if ( g_gametype.integer >= GT_TEAM ) {
 		// praise a team mate who just got a reward
-		for(i = 0; i < MAX_CLIENTS; i++) {
+		for ( i = 0; i < MAX_CLIENTS; i++ ) {
 			who = g_entities + i;
 			if (who->client && who != ent && who->client->sess.sessionTeam == ent->client->sess.sessionTeam) {
 				if (who->client->rewardTime > level.time) {

@@ -58,18 +58,18 @@ static client_t *SV_GetPlayerByHandle( void ) {
 	s = Cmd_Argv(1);
 
 	// Check whether this is a numeric player handle
-	for(i = 0; s[i] >= '0' && s[i] <= '9'; i++);
+	for ( i = 0; s[i] >= '0' && s[i] <= '9'; i++ );
 	
-	if(!s[i])
+	if ( !s[i] )
 	{
 		int plid = atoi(s);
 
 		// Check for numeric playerid match
-		if(plid >= 0 && plid < sv_maxclients->integer)
+		if ( plid >= 0 && plid < sv_maxclients->integer )
 		{
 			cl = &svs.clients[plid];
 			
-			if(cl->state)
+			if ( cl->state )
 				return cl;
 		}
 	}
@@ -120,8 +120,8 @@ static client_t *SV_GetPlayerByNum( void ) {
 
 	s = Cmd_Argv(1);
 
-	for (i = 0; s[i]; i++) {
-		if (s[i] < '0' || s[i] > '9') {
+	for ( i = 0; s[i]; i++ ) {
+		if ( s[i] < '0' || s[i] > '9' ) {
 			Com_Printf( "Bad slot number: %s\n", s);
 			return NULL;
 		}
@@ -174,7 +174,7 @@ static void SV_Map_f( void ) {
 	Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_USERINFO | CVAR_LATCH );
 
 	cmd = Cmd_Argv(0);
-	if( Q_stricmpn( cmd, "sp", 2 ) == 0 ) {
+	if ( Q_stricmpn( cmd, "sp", 2 ) == 0 ) {
 		Cvar_SetValue( "g_gametype", GT_SINGLE_PLAYER );
 		Cvar_SetValue( "g_doWarmup", 0 );
 		// may not set sv_maxclients directly, always set latched
@@ -244,13 +244,13 @@ static void SV_MapRestart_f( void ) {
 		return;
 	}
 
-	if (Cmd_Argc() > 1 ) {
+	if ( Cmd_Argc() > 1 ) {
 		delay = atoi( Cmd_Argv(1) );
 	}
 	else {
 		delay = 5;
 	}
-	if( delay && !Cvar_VariableValue("g_doWarmup") ) {
+	if ( delay && !Cvar_VariableValue("g_doWarmup") ) {
 		sv.restartTime = sv.time + delay * 1000;
 		SV_SetConfigstring( CS_WARMUP, va("%i", sv.restartTime) );
 		return;
@@ -287,7 +287,7 @@ static void SV_MapRestart_f( void ) {
 	SV_RestartGameProgs();
 
 	// run a few frames to allow everything to settle
-	for (i = 0; i < 3; i++)
+	for ( i = 0; i < 3; i++ )
 	{
 		VM_Call (gvm, GAME_RUN_FRAME, sv.time);
 		sv.time += 100;
@@ -298,7 +298,7 @@ static void SV_MapRestart_f( void ) {
 	sv.restarting = qfalse;
 
 	// connect and begin all the clients
-	for (i=0 ; i<sv_maxclients->integer ; i++) {
+	for ( i=0 ; i<sv_maxclients->integer ; i++ ) {
 		client = &svs.clients[i];
 
 		// send the new gamestate to all connected clients
@@ -367,7 +367,7 @@ static void SV_Kick_f( void ) {
 				if ( !cl->state ) {
 					continue;
 				}
-				if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+				if ( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 					continue;
 				}
 				SV_DropClient( cl, "was kicked" );
@@ -379,7 +379,7 @@ static void SV_Kick_f( void ) {
 				if ( !cl->state ) {
 					continue;
 				}
-				if( cl->netchan.remoteAddress.type != NA_BOT ) {
+				if ( cl->netchan.remoteAddress.type != NA_BOT ) {
 					continue;
 				}
 				SV_DropClient( cl, "was kicked" );
@@ -388,7 +388,7 @@ static void SV_Kick_f( void ) {
 		}
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if ( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -421,11 +421,11 @@ static void SV_Ban_f( void ) {
 
 	cl = SV_GetPlayerByHandle();
 
-	if (!cl) {
+	if ( !cl ) {
 		return;
 	}
 
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if ( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -479,7 +479,7 @@ static void SV_BanNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if ( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -532,7 +532,7 @@ static void SV_KickNum_f( void ) {
 	if ( !cl ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if ( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
@@ -563,17 +563,17 @@ static void SV_Status_f( void ) {
 
 	Com_Printf ("num score ping name            lastmsg address               qport rate\n");
 	Com_Printf ("--- ----- ---- --------------- ------- --------------------- ----- -----\n");
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++)
+	for ( i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ )
 	{
-		if (!cl->state)
+		if ( !cl->state )
 			continue;
 		Com_Printf ("%3i ", i);
 		ps = SV_GameClientNum( i );
 		Com_Printf ("%5i ", ps->persistant[PERS_SCORE]);
 
-		if (cl->state == CS_CONNECTED)
+		if ( cl->state == CS_CONNECTED )
 			Com_Printf ("CNCT ");
-		else if (cl->state == CS_ZOMBIE)
+		else if ( cl->state == CS_ZOMBIE )
 			Com_Printf ("ZMBI ");
 		else
 		{
@@ -586,7 +586,7 @@ static void SV_Status_f( void ) {
     // NOTE: colored names in status breaks the padding (WONTFIX)
     Com_Printf ("^7");
 		l = 16 - strlen(cl->name);
-		for (j=0 ; j<l ; j++)
+		for ( j=0 ; j<l ; j++ )
 			Com_Printf (" ");
 
 		Com_Printf ("%7i ", svs.time - cl->lastPacketTime );
@@ -594,7 +594,7 @@ static void SV_Status_f( void ) {
 		s = NET_AdrToString( cl->netchan.remoteAddress );
 		Com_Printf ("%s", s);
 		l = 22 - strlen(s);
-		for (j=0 ; j<l ; j++)
+		for ( j=0 ; j<l ; j++ )
 			Com_Printf (" ");
 		
 		Com_Printf ("%5i", cl->netchan.qport);
