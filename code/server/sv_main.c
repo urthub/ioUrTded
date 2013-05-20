@@ -54,6 +54,9 @@ cvar_t	*sv_floodProtect;
 cvar_t	*sv_lanForceRate; // dedicated 1 (LAN) server forces local client rates to 99999 (bug #491)
 cvar_t	*sv_strictAuth;
 
+cvar_t  *sv_sayprefix;			// customize server messages, default: console
+cvar_t  *sv_tellprefix;			// customize server messages, default: console-tell
+
 /*
 =============================================================================
 
