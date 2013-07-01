@@ -263,12 +263,12 @@ void SV_DirectConnect( netadr_t from ) {
 
 		// never reject a LAN client based on ping
 		if ( !Sys_IsLANAddress( from ) ) {
-			if ( sv_minPing->value && ping < sv_minPing->value ) {
+			if ( (sv_minPing->value > 0) && ping < sv_minPing->value ) {
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for high pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too low ping\n", i);
 				return;
 			}
-			if ( sv_maxPing->value && ping > sv_maxPing->value ) {
+			if ( (sv_maxPing->value > 0) && ping > sv_maxPing->value ) {
 				NET_OutOfBandPrint( NS_SERVER, from, "print\nServer is for low pings only\n" );
 				Com_DPrintf ("Client %i rejected on a too high ping\n", i);
 				return;
@@ -1319,7 +1319,7 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 
 			argsFromOneMaxlen = -1;
 			if ( Q_stricmp("say", Cmd_Argv(0) ) == 0 ||
-					Q_stricmp("say_team", Cmd_Argv(0)) == 0) {
+				Q_stricmp("say_team", Cmd_Argv(0)) == 0) {
 				argsFromOneMaxlen = MAX_SAY_STRLEN;
 			}
 			else if ( Q_stricmp("tell", Cmd_Argv(0)) == 0 ) {
@@ -1364,7 +1364,7 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 				}
 				if ( exploitDetected ) {
 					Com_Printf("Buffer overflow exploit radio/say, possible attempt from %s\n",
-						NET_AdrToString(cl->netchan.remoteAddress));
+					NET_AdrToString(cl->netchan.remoteAddress));
 					SV_SendServerCommand(cl, "print \"Chat dropped due to message length constraints.\n\"");
 					return;
 				}
@@ -1373,8 +1373,9 @@ void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK ) {
 			VM_Call( gvm, GAME_CLIENT_COMMAND, cl - svs.clients );
 		}
 	}
-	else if (!bProcessed)
+	else if (!bProcessed) {
 		Com_DPrintf( "client text ignored for %s: %s\n", cl->name, Cmd_Argv(0) );
+	}
 }
 
 /*
