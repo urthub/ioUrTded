@@ -1,7 +1,7 @@
 # ioUrTded v1.35
 Server binary for [Urban Terror](http://www.urbanterror.info) **4.1.1**
 
-For more details see the ioquake3 [README](https://github.com/urthub/ioUrTded/README) and the ioUrbanTerror [README](https://github.com/urthub/ioUrTded/blob/master/ioUrbanTerror_README.txt).
+For more details see the ioquake3 [README](https://github.com/urthub/ioUrTded/blob/master/README) and the ioUrbanTerror [README](https://github.com/urthub/ioUrTded/blob/master/ioUrbanTerror_README.txt).
 
 ## Modifications
 - Customize server messages with prefixes
